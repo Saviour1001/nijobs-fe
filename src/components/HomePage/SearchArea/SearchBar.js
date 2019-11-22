@@ -7,19 +7,14 @@ import {
     IconButton,
 } from "@material-ui/core";
 
-import { Search } from "@material-ui/icons";
+import { Close, MoreHoriz } from "@material-ui/icons";
 
 const SearchBar = (props) => {
 
-    const { searchValue, setSearchValue, className, submitSearchForm } = props;
+    const { searchValue, setSearchValue, className, handleAdvancedOptionsButtonClick, advancedOptions } = props;
 
     const handleChange = (e) => {
         setSearchValue(e.target.value);
-    };
-
-    const handleButtonClick = (e) => {
-        e.preventDefault();
-        submitSearchForm(e);
     };
 
     return (
@@ -34,11 +29,11 @@ const SearchBar = (props) => {
                 "endAdornment":
     <InputAdornment position="end">
         <IconButton
-            aria-label="search"
-            onClick={handleButtonClick}
+            aria-label="Toggle Advanced Search"
+            onClick={handleAdvancedOptionsButtonClick}
             color="secondary"
         >
-            <Search />
+            {advancedOptions ? <Close fontSize="small"/> : <MoreHoriz/>}
         </IconButton>
     </InputAdornment>,
             }}
@@ -50,7 +45,8 @@ SearchBar.propTypes = {
     searchValue: PropTypes.string.isRequired,
     setSearchValue: PropTypes.func.isRequired,
     className: PropTypes.string,
-    submitSearchForm: PropTypes.func.isRequired,
+    handleAdvancedOptionsButtonClick: PropTypes.func.isRequired,
+    advancedOptions: PropTypes.bool.isRequired,
 };
 
 export default SearchBar;

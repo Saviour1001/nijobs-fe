@@ -22,7 +22,7 @@ import {
 } from "@material-ui/core";
 
 import SearchBar from "./SearchBar";
-import ShowAdvancedOptionsButton from "./ShowAdvancedOptionsButton";
+import SubmitSearchButton from "./SubmitSearchButton";
 import SliderValueTooltip from "./SliderValueTooltip";
 
 import useSearchAreaStyles from "./searchAreaStyle";
@@ -80,9 +80,10 @@ export const SearchArea = ({ addSnackbar, onSubmit, searchOffers, searchValue,
             >
                 <SearchBar
                     className={classes.searchBar}
-                    submitSearchForm={submitForm}
                     searchValue={searchValue}
                     setSearchValue={setSearchValue}
+                    handleAdvancedOptionsButtonClick={handleAdvancedOptionsButtonClick}
+                    advancedOptions={advancedOptions}
                 />
                 <Collapse
                     in={advancedOptions}
@@ -128,9 +129,8 @@ export const SearchArea = ({ addSnackbar, onSubmit, searchOffers, searchValue,
                     </FormControl>
                 </Collapse>
             </form>
-            <ShowAdvancedOptionsButton
-                onClick={handleAdvancedOptionsButtonClick}
-                isOpen={advancedOptions}
+            <SubmitSearchButton
+                onClick={submitForm}
             />
         </Paper>
     );

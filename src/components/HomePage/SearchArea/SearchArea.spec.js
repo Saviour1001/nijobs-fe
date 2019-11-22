@@ -1,17 +1,19 @@
 import React from "react";
 import { SearchArea, mapDispatchToProps, mapStateToProps } from "./SearchArea";
 import { addSnackbar } from "../../../actions/notificationActions";
-import { setSearchValue, setJobDuration, setJobType } from "../../../actions/searchOffersActions";
+import { setSearchValue, setJobDuration, setJobType, resetAdvancedSearchFields } from "../../../actions/searchOffersActions";
 import SearchBar from "./SearchBar";
-import ShowAdvancedOptionsButton from "./ShowAdvancedOptionsButton";
+import SubmitSearchButton from "./SubmitSearchButton";
 
 import {
     FormControl,
     Paper,
     TextField,
     Collapse,
+    Fab,
 } from "@material-ui/core";
 import { mockDateNow, mockRandomMath } from "../../../../testUtils";
+import { INITIAL_JOB_TYPE, INITIAL_JOB_DURATION } from "../../../reducers/searchOffersReducer";
 
 describe("SearchArea", () => {
     let onSubmit;
@@ -36,12 +38,6 @@ describe("SearchArea", () => {
 
         it("should render a Collapse", () => {
             expect(shallow(<SearchArea onSubmit={onSubmit} />).find(Collapse).first().prop("in")).toBe(false);
-        });
-
-        it("should render a ShowAdvancedOptionsButton", () => {
-            const searchArea = shallow(<SearchArea onSubmit={onSubmit} />);
-            const button = searchArea.find(ShowAdvancedOptionsButton).first();
-            expect(button.prop("isOpen")).toBe(false);
         });
 
         it("should contain a TextField with 'job_type' id", () => {
@@ -75,24 +71,27 @@ describe("SearchArea", () => {
             expect(searchOffersMock).toHaveBeenCalledTimes(1);
         });
 
-        it("should toggle advanced options when clicking ShowAdvancedOptionsButton", () => {
-            const searchArea = shallow(<SearchArea onSubmit={onSubmit}/>);
-            const button = searchArea.find(ShowAdvancedOptionsButton).first();
+        it("should call searchOffers and onSubmit callback on search button click", () => {
+            const searchValue = "test";
+            const setSearchValue = () => {};
 
-            expect(searchArea.find(Collapse).first().prop("in")).toBe(false);
-            button.simulate("click");
-            expect(searchArea.find(Collapse).first().prop("in")).toBe(true);
+            const searchOffers = jest.fn();
+            const onSubmit = jest.fn();
+            const addSnackbar = () => {};
 
-        });
+            const wrapper = mount(
+                <SearchArea
+                    searchValue={searchValue}
+                    setSearchValue={setSearchValue}
+                    searchOffers={searchOffers}
+                    addSnackbar={addSnackbar}
+                    onSubmit={onSubmit}
+                />
+            );
+            wrapper.find(Fab).first().simulate("click", { e: { preventDefault: () => {} } });
 
-        it("should toggle advanced options when clicking ShowAdvancedOptionsButton", () => {
-            const searchArea = shallow(<SearchArea onSubmit={onSubmit}/>);
-            const button = searchArea.find(ShowAdvancedOptionsButton).first();
-
-            expect(searchArea.find(Collapse).first().prop("in")).toBe(false);
-            button.simulate("click");
-            expect(searchArea.find(Collapse).first().prop("in")).toBe(true);
-
+            expect(searchOffers).toHaveBeenCalledTimes(1);
+            expect(onSubmit).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -144,6 +143,7 @@ describe("SearchArea", () => {
 
             props.setJobType(jobType);
             expect(dispatch).toHaveBeenCalledWith(setJobType("jobType"));
+
         });
     });
 });
