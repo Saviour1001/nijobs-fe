@@ -1,38 +1,37 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import { RowPropTypes } from "./PropTypes";
+import { ApplicationStateLabel } from "../../components/Review/Applications/ApplicationsReviewTableSchema";
+import { format } from "date-fns";
 
-const MutableDataTable = ({ rows: initialRows, tableType: Table, ...props }) => {
-    const [rows, setRows] = useState(initialRows);
+const MutableDataTable = ({ rows: initialRows, tableType: Table, setInitialRows, ...props }) => {
+    const [rows, setRows] = useState(() => initialRows);
 
-    useEffect(() => {
-        setRows(initialRows);
-    }, [initialRows]);
+    const approveApplicationRow = useCallback(({ key, fields }) => {
 
-    const changeRowState = useCallback((row, state) => {
-        const { key, fields } = row;
-
-        setRows((rows) => ({
+        setInitialRows((rows) => ({
             ...rows,
             [key]: {
                 ...rows[key],
-                fields: { ...fields, state: { value: state } },
+                fields: { ...fields, state: { value: ApplicationStateLabel.APPROVED } },
             } }));
-    }, []);
+    }, [setInitialRows]);
 
-    const updateRowRejectReason = useCallback((row, rejectReason) => {
-        const { key, payload } = row;
+    const rejectApplicationRow = useCallback(({ key, fields, payload }, rejectReason) => {
 
-        setRows((rows) => ({
+        setInitialRows((rows) => ({
             ...rows,
             [key]: {
                 ...rows[key],
+                fields: { ...fields, state: { value: ApplicationStateLabel.REJECTED } },
                 payload: {
                     ...payload,
                     rejectReason,
+                    rejectedAt: format(Date.now(), "yyyy-MM-dd"),
                 },
             } }));
-    }, []);
+    }, [setInitialRows]);
+
     return (
         <Table
             key={JSON.stringify(initialRows).substring(0, 20)}
@@ -40,8 +39,8 @@ const MutableDataTable = ({ rows: initialRows, tableType: Table, ...props }) => 
             rows={rows}
             setRows={setRows}
             RowActionsProps={{
-                changeRowState,
-                updateRowRejectReason,
+                approveApplicationRow,
+                rejectApplicationRow,
             }}
             {...props}
         />
@@ -51,6 +50,7 @@ const MutableDataTable = ({ rows: initialRows, tableType: Table, ...props }) => 
 
 MutableDataTable.propTypes = {
     rows: PropTypes.objectOf(RowPropTypes),
+    setInitialRows: PropTypes.func.isRequired,
     tableType: PropTypes.elementType,
 };
 

@@ -17,7 +17,7 @@ import ConfirmRejectDialog from "./ConfirmRejectDialog";
 
 
 const BaseRowActions = ({
-    addSnackbar, row, submitUndoableAction, changeRowState, updateRowRejectReason, isCollapseOpen, toggleCollapse,
+    addSnackbar, row, submitUndoableAction, approveApplicationRow, rejectApplicationRow, isCollapseOpen, toggleCollapse,
 }) => {
 
     const [actionToConfirm, setActionToConfirm] = useState(null);
@@ -32,22 +32,19 @@ const BaseRowActions = ({
                 `Approving Application for ${getFieldValue(row, "name")}...`,
                 () => {
                     approveApplication(row.key)
-                        .then(() => changeRowState(row, ApplicationStateLabel.APPROVED))
+                        .then(() => approveApplicationRow(row))
                         .catch(() => {
                             addSnackbar({
                                 message: `An unexpected error occurred. Could not approve ${getFieldValue(row, "name")}'s application.`,
                                 key: `${row.key}-error`,
                             });
-                            changeRowState(row, ApplicationStateLabel.PENDING);
                         });
                 },
-                () => {
-                    changeRowState(row, ApplicationStateLabel.PENDING);
-                },
+                () => {},
                 3000
             );
         },
-        [addSnackbar, changeRowState, row, submitUndoableAction],
+        [addSnackbar, approveApplicationRow, row, submitUndoableAction],
     );
 
     const handleReject = useCallback(
@@ -60,23 +57,19 @@ const BaseRowActions = ({
                 () => {
                     rejectApplication(row.key, rejectReason)
                         .then(() => {
-                            changeRowState(row, ApplicationStateLabel.REJECTED);
-                            updateRowRejectReason(row, rejectReason);
+                            rejectApplicationRow(row, rejectReason);
                         })
                         .catch(() => {
                             addSnackbar({
                                 message: `An unexpected error occurred. Could not reject ${getFieldValue(row, "name")}'s application.`,
                                 key: `${row.key}-error`,
                             });
-                            changeRowState(row, ApplicationStateLabel.PENDING);
                         });
                 },
-                () => {
-                    changeRowState(row, ApplicationStateLabel.PENDING);
-                },
+                () => {},
                 3000
             );
-        }, [addSnackbar, changeRowState, rejectReason, row, submitUndoableAction, updateRowRejectReason]);
+        }, [addSnackbar, rejectApplicationRow, rejectReason, row, submitUndoableAction]);
 
 
     const handleAction = (actionLabel) => (e) => {
@@ -177,12 +170,12 @@ const BaseRowActions = ({
 
 BaseRowActions.propTypes = {
     addSnackbar: PropTypes.func.isRequired,
-    updateRowRejectReason: PropTypes.func.isRequired,
+    approveApplicationRow: PropTypes.func.isRequired,
+    rejectApplicationRow: PropTypes.func.isRequired,
     isCollapseOpen: PropTypes.bool.isRequired,
     toggleCollapse: PropTypes.func.isRequired,
     row: RowPropTypes,
     submitUndoableAction: PropTypes.func,
-    changeRowState: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = () => ({});

@@ -15,12 +15,14 @@ export const ControlledFilterableTable = ({
     const [activeFilters, setActiveFilters] = useState({});
     const [filtersContext, setFiltersContext] = useState({});
 
+
     useEffect(() => {
         // This does filtering purely on the client side.
         // Since we are expecting the number of rows to be small, it's ok to do it on the client
         const newRows = Object.values(activeFilters).reduce((updatedRows, filter) => filter(updatedRows), initialRows);
         setRows(newRows);
     }, [activeFilters, initialRows, setRows]);
+
     return (
         <TableComponent
             rows={rows}

@@ -96,6 +96,7 @@ const ApplicationsReviewWidget = () => {
                             tableComponent={ControlledSortableSelectableTable}
                             defaultSort="name"
                             rows={rows}
+                            setInitialRows={setRows}
                             columns={columns}
                             sorters={sorters}
                             filters={filters}
